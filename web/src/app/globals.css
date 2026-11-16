@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/* Editor's desk: warm paper, ink, and one recording-light accent. */
+:root {
+  --paper: #f5f2ea;
+  --surface: #fbf9f4;
+  --sunk: #ece8dd;
+  --ink: #1c1a17;
+  --muted: #6b655c;
+  --line: #dcd6c8;
+  --accent: #cf3f1b;
+  --accent-ink: #fffaf5;
+  --ok: #3c7a4c;
+  --bad: #9a2a2a;
+  --tiktok: #12a8a0;
+  --instagram: #b8317c;
+  --youtube: #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #161412;
+    --surface: #1e1b18;
+    --sunk: #110f0e;
+    --ink: #ebe6db;
+    --muted: #9c958a;
+    --line: #322e28;
+    --accent: #f0633c;
+    --accent-ink: #1a0e09;
+    --ok: #6fb583;
+    --bad: #e07a6f;
+    --tiktok: #35cfc6;
+    --instagram: #e065ad;
+    --youtube: #ef6a61;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-ok: var(--ok);
+  --color-bad: var(--bad);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-[4px] border border-line bg-surface px-3 text-[13px] font-medium whitespace-nowrap text-ink transition-colors hover:border-muted disabled:cursor-not-allowed disabled:opacity-45;
+  }
+  .btn-primary {
+    @apply border-accent bg-accent text-accent-ink hover:border-accent hover:brightness-110;
+  }
+  .btn-quiet {
+    @apply border-transparent bg-transparent text-muted hover:border-line hover:text-ink;
+  }
+  .field {
+    @apply h-8 rounded-[4px] border border-line bg-surface px-2.5 text-[13px] text-ink placeholder:text-muted;
+  }
+  .label {
+    @apply font-mono text-[11px] tracking-[0.08em] text-muted uppercase;
+  }
+  .num {
+    @apply font-mono tabular-nums;
+  }
+}
+
+/* Live job indicator: the only looping motion in the app. */
+@keyframes rec {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.rec {
+  animation: rec 1.2s ease-in-out infinite;
+}
+
+@keyframes saved {
+  from { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+  to { background: transparent; }
+}
+.saved {
+  animation: saved 0.9s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rec, .saved { animation: none; }
+}
