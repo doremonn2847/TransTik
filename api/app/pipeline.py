@@ -7,7 +7,7 @@ from pathlib import Path
 
 import httpx
 
-from . import asr, captions, config, library, urls
+from . import asr, captions, config, library, settings_store, urls
 from .acquire import VideoMeta, acquirer, pick_caption_track
 from .errors import KnownFailure
 
@@ -47,7 +47,7 @@ def _from_asr(job_id: int, url: str, meta: VideoMeta) -> tuple[list[dict], str |
     if meta.duration and meta.duration > config.MAX_DURATION_S:
         raise KnownFailure("TOO_LONG", f"{meta.duration}s")
     library.set_job(job_id, "transcribing")
-    with tempfile.TemporaryDirectory(prefix="tdesk_") as tmp:  # audio is deleted as soon as this block ends
+    with tempfile.TemporaryDirectory(prefix="transtik_") as tmp:  # audio is deleted as soon as this block ends
         audio = acquirer.audio(url, Path(tmp))
         segs, lang = asr.transcribe(audio, prompt=meta.title)
     segs = captions.drop_repeats(captions.normalize(segs))
@@ -87,7 +87,7 @@ def run_job(job_id: int) -> int:
         source, model = "platform_captions", None
     else:
         segs, lang = _from_asr(job_id, url, meta)
-        source, model = "asr", config.ASR_MODEL
+        source, model = "asr", settings_store.asr()["model"]
 
     thumb = _save_thumbnail(meta, platform, video_id)
     return library.save_transcript(platform, video_id, meta, segs, lang or meta.language, source, model, thumb)

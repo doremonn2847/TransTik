@@ -9,7 +9,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 const newsreader = Newsreader({ variable: "--font-newsreader", subsets: ["latin", "latin-ext", "vietnamese"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
-  title: { default: "Transcript Desk", template: "%s · Transcript Desk" },
+  title: { default: "TransTik", template: "%s · TransTik" },
   description: "Transcripts of TikTok, Instagram Reels and YouTube Shorts, in a private library.",
 };
 

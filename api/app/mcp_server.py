@@ -15,7 +15,7 @@ Kind = Literal["hooks", "remix", "virality"]
 Format = Literal["txt", "srt", "vtt", "json", "csv", "md"]
 
 INSTRUCTIONS = """\
-Transcript Desk turns TikTok, Instagram Reel and YouTube (Shorts) links into transcripts and keeps
+TransTik turns TikTok, Instagram Reel and YouTube (Shorts) links into transcripts and keeps
 them in a searchable personal library.
 
 Typical flow: transcribe_url (one link) or transcribe_batch (many) -> get_transcript / search_library.
@@ -28,7 +28,7 @@ derived from a transcript, call check_originality.
 Failures come back with an error_code and a hint; relay the hint to the user rather than guessing.
 """
 
-mcp = MCPServer("transcript-desk", title="Transcript Desk", instructions=INSTRUCTIONS, version="0.1.0")
+mcp = MCPServer("transtik", title="TransTik", instructions=INSTRUCTIONS, version="0.1.0")
 
 
 def _payload(transcript_id: int, timestamps: bool = False, include_stats: bool = True) -> dict:

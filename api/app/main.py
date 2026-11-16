@@ -32,7 +32,7 @@ async def lifespan(_: FastAPI):
     await worker.stop()
 
 
-app = FastAPI(title="Transcript Desk", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="TransTik", version="0.1.0", lifespan=lifespan)
 app.include_router(router)
 app.mount("/", mcp_app)  # serves /mcp; registered last so /api/* wins
 

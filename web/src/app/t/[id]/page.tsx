@@ -68,7 +68,7 @@ export default function TranscriptPage() {
 
   const words = t.text.split(/\s+/).filter(Boolean).length;
   const wpm = t.duration_s ? Math.round(words / (t.duration_s / 60)) : null;
-  const askPrompt = `Use Transcript Desk: read transcript ${t.id} ("${t.title ?? "untitled"}") and `;
+  const askPrompt = `Use TransTik: read transcript ${t.id} ("${t.title ?? "untitled"}") and `;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">

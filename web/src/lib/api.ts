@@ -27,8 +27,14 @@ export interface Job {
 export interface Folder { id: number; name: string; count: number }
 export interface Tag { tag: string; count: number }
 
+export interface AsrStatus {
+  configured: boolean; base_url: string; model: string;
+  provider: "openai" | "groq" | "custom"; source: "settings" | "env" | "none"; key_hint: string | null;
+  providers: Record<string, { label: string; base_url: string; model: string }>;
+}
+
 export interface Status {
-  asr: { configured: boolean; base_url: string; model: string };
+  asr: AsrStatus;
   ytdlp_version: string; ffmpeg: boolean; js_runtime: boolean; cookies: boolean;
   mcp: { local_url: string; tunnel_url: string | null };
   library_count: number; in_docker: boolean;
@@ -73,6 +79,9 @@ export const api = {
 
   status: () => req<Status>("/settings/status"),
   asrTest: () => post<{ ok: boolean; message: string }>("/settings/asr-test"),
+  saveAsr: (body: { provider: string; api_key: string; base_url?: string; model?: string }) =>
+    req<AsrStatus & { test: { ok: boolean; message: string } }>("/settings/asr", { method: "PUT", body: JSON.stringify(body) }),
+  clearAsr: () => req<AsrStatus>("/settings/asr", { method: "DELETE" }),
   ytdlpUpdate: () => post<{ ok: boolean; message: string }>("/settings/ytdlp-update"),
 
   exportUrl: (id: number, format: ExportFormat, timestamps = false) =>

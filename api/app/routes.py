@@ -15,7 +15,7 @@ from fastapi import APIRouter, HTTPException, Query, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from . import asr, config, exports, library, worker
+from . import asr, config, exports, library, settings_store, worker
 
 router = APIRouter(prefix="/api")
 Format = Literal["txt", "srt", "vtt", "json", "csv", "md"]
@@ -205,7 +205,7 @@ async def _tunnel_url() -> str | None:
 @router.get("/settings/status")
 async def status() -> dict:
     return {
-        "asr": {"configured": asr.configured(), "base_url": config.ASR_BASE_URL, "model": config.ASR_MODEL},
+        "asr": _asr_view(),
         "ytdlp_version": yt_dlp.version.__version__,
         "ffmpeg": bool(shutil.which("ffmpeg")),
         "js_runtime": bool(shutil.which("deno")),
@@ -214,6 +214,37 @@ async def status() -> dict:
         "library_count": library.list_library(limit=1)["total"],
         "in_docker": config.IN_DOCKER,
     }
+
+
+def _asr_view() -> dict:
+    cfg = settings_store.asr()
+    return {"configured": bool(cfg["api_key"]), "base_url": cfg["base_url"], "model": cfg["model"],
+            "provider": settings_store.provider_of(cfg["base_url"]), "source": cfg["source"],
+            "key_hint": settings_store.masked(cfg["api_key"]),
+            "providers": settings_store.PROVIDERS}
+
+
+class AsrSettings(BaseModel):
+    provider: str
+    api_key: str
+    base_url: str | None = None
+    model: str | None = None
+
+
+@router.put("/settings/asr")
+async def save_asr(body: AsrSettings) -> dict:
+    try:
+        settings_store.save_asr(body.provider, body.api_key, body.base_url, body.model)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    result = await asyncio.to_thread(asr.self_test)
+    return {**_asr_view(), "test": result}
+
+
+@router.delete("/settings/asr")
+def clear_asr() -> dict:
+    settings_store.clear_asr()
+    return _asr_view()
 
 
 @router.post("/settings/asr-test")

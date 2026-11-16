@@ -25,7 +25,7 @@ export function Nav() {
       <div className="mx-auto flex h-12 max-w-6xl items-center gap-6 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-serif text-[17px] font-medium tracking-tight">
           <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
-          Transcript Desk
+          TransTik
         </Link>
         <nav className="flex h-full items-stretch gap-1">
           {NAV.map((n) => (

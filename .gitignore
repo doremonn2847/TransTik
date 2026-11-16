@@ -1,9 +1,18 @@
+# Secrets and personal data
 .env
-data/
+data/*
 !data/.gitkeep
+
+# Local tooling
+.claude/
+
+# Python
 __pycache__/
 .venv/
 .pytest_cache/
+
+# Node
 node_modules/
 .next/
+
 *.log

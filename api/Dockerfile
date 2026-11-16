@@ -10,7 +10,9 @@ ENV PYTHONUNBUFFERED=1 \
     HOST=0.0.0.0 \
     IN_DOCKER=1
 
-RUN apt-get update \
+# Retries ride out brief network drops during the large ffmpeg download.
+RUN printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\n' > /etc/apt/apt.conf.d/80retries \
+ && apt-get update \
  && apt-get install -y --no-install-recommends ffmpeg ca-certificates \
  && rm -rf /var/lib/apt/lists/* \
  && pip install --no-cache-dir uv==0.13.0

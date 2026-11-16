@@ -1,165 +1,238 @@
-# Transcript Desk
+# TransTik
 
-A private tool for one or two people. It turns TikTok, Instagram Reel and YouTube (Shorts) links into transcripts, keeps them in a searchable library, and lets **Claude or ChatGPT** use all of it through an MCP server.
+Turn TikTok, Instagram Reels and YouTube Shorts links into transcripts. Keep them in a private, searchable library, and let **Claude** (or ChatGPT) read them for you to write hooks and scripts or explain why a video worked.
 
-- Paste one link, many links, or a profile/playlist link.
-- Uses the platform's own captions when they exist (free, instant), and falls back to speech-to-text when they don't.
-- Library with full-text search, folders, tags and inline corrections.
-- Exports TXT, SRT, VTT, Markdown, CSV and JSON, or a ZIP of many.
-- MCP tools for transcribing, searching and exporting, plus playbooks for hooks, scripts and "why did this go viral", and an originality check.
+- Paste one link, many links, or a whole profile or playlist.
+- Uses the video's own captions when it has them (free and instant). Otherwise it listens to the audio with speech-to-text.
+- Search every word you've saved, sort transcripts into folders and tags, and fix mistakes by clicking a line.
+- Download as TXT, SRT, VTT, Markdown, CSV or JSON, or many at once as a ZIP.
 
-Everything runs on your own laptop in Docker. Each install has its own library.
-
----
-
-## 1. Install
-
-You need **Docker Desktop** ([Windows / Mac](https://www.docker.com/products/docker-desktop/)) running.
-
-```bash
-git clone <this repo> transcript-desk
-cd transcript-desk
-cp .env.example .env
-```
-
-Open `.env` and set `ASR_API_KEY` (see below). Then start it:
-
-```bash
-docker compose up -d --build
-```
-
-Open **http://localhost:3000**. The first build takes a few minutes; later starts take seconds.
-
-### Speech-to-text key
-
-Only needed for videos **without** captions. That covers most TikToks and Reels, so set it.
-
-- **Groq** (default, very cheap): create a key at console.groq.com → API Keys, paste it into `ASR_API_KEY`.
-- **OpenAI**: set `ASR_BASE_URL=https://api.openai.com/v1`, `ASR_MODEL=whisper-1`, and your key.
-
-After changing `.env`, run `docker compose up -d` again. **Settings → Test key** confirms it works.
-
-Audio is sent to that provider and deleted locally right after. Caption-based transcripts never leave your machine.
-
-### Everyday commands
-
-| Do this | Command |
-|---|---|
-| Start | `docker compose up -d` |
-| Stop | `docker compose down` |
-| Update the app after pulling new code | `docker compose up -d --build` |
-| See what the backend is doing | `docker compose logs -f api` |
-| Check every platform still works | `docker compose exec api python -m app.smoke` |
+TransTik runs on **your own computer**. Your library stays on your computer and isn't shared with anyone, including other people who use TransTik.
 
 ---
 
-## 2. Connect an assistant
+## Set up on a Mac (about 20 minutes, once)
 
-The MCP endpoint is **http://localhost:8765/mcp**. Settings shows the same instructions with copy buttons.
+### What you need
+
+- A Mac with an up-to-date macOS (Docker Desktop supports the three most recent versions). Apple chip or Intel both work.
+- About 4 GB of free disk space
+- An **API key** for speech-to-text, from OpenAI or Groq (step 4 explains)
+
+### Step 1: Install Docker Desktop
+
+TransTik runs inside Docker, a free app that keeps it self-contained.
+
+1. Find out which chip your Mac has: the **Apple menu → About This Mac**. Look at **Chip** (says "Apple M…") or **Processor** (says "Intel").
+2. Go to **https://www.docker.com/products/docker-desktop/** and download Docker Desktop for that chip.
+3. Open the downloaded `.dmg` and drag **Docker** into **Applications**.
+4. Open **Docker** from Applications. Accept the terms, and skip signing in (you don't need an account).
+5. Wait until the whale icon in the menu bar at the top of the screen stops animating. Docker is now running.
+
+> Tip: in Docker Desktop's **Settings → General**, turn on **Start Docker Desktop when you sign in to your computer**. Then TransTik is always ready after a restart.
+
+### Step 2: Download TransTik
+
+1. Open **https://github.com/doremonn2847/TransTik**.
+2. Click the green **Code** button, then **Download ZIP**.
+3. Open your **Downloads** folder and double-click `TransTik-main.zip` to unzip it.
+4. Move the `TransTik-main` folder into your **Documents** folder.
+
+### Step 3: Start TransTik
+
+1. Open **Terminal**: press **⌘ + Space**, type `Terminal`, and press **Return**.
+2. Copy this line, paste it into Terminal, and press **Return**:
+
+   ```bash
+   cd ~/Documents/TransTik-main
+   ```
+
+3. Then copy, paste and press **Return** again:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+The first time takes **5 to 15 minutes**: Docker downloads and builds everything. You'll see a lot of text scroll by. It's finished when you get your prompt back and see lines ending in **Started**.
+
+You can close Terminal afterwards. TransTik keeps running in the background.
+
+### Step 4: Add your speech-to-text key
+
+1. Open **http://localhost:3000** in Safari or Chrome. Bookmark it.
+2. Click **Settings** at the top.
+3. Under **Speech-to-text**, choose a provider:
+   - **OpenAI**: create a key at **https://platform.openai.com/api-keys** (it starts with `sk-`). Your account needs a little credit; $5 lasts a very long time.
+   - **Groq**: cheaper, with a free tier. Create a key at **https://console.groq.com/keys**.
+4. Paste the key and click **Save and test**. A green message means it worked.
+
+The key is saved only on your Mac. With OpenAI it costs about 0.6 cents per minute of audio, so a typical 30-second TikTok costs about a third of a cent. Videos that already have captions cost nothing.
+
+**Done.** Go to **Inbox**, paste a link, and click **Transcribe**.
+
+---
+
+## Using TransTik
+
+**Inbox:** paste links (one per line, or mixed into any text) and press **Transcribe** (or **⌘ + Return**). Paste a profile or playlist link to bring in up to 50 of its videos. Each link shows its progress; click a finished one to open it.
+
+**Library:** everything you've transcribed. Type in the search box (press **/** to jump there) to find any word said in any video. Tick several to download them together as a ZIP, or delete them.
+
+**Transcript page:**
+- **Copy text** copies it all (or press **C**). Untick **Timestamps** for plain text.
+- **Click any line to fix a mistake.** Press Return to save, Esc to cancel. Your fixes are used in every download.
+- Click a timestamp to open the video at that moment (YouTube only).
+- On the right: views, likes and comments, downloads, folders and tags.
+- **Re-transcribe from audio** helps when a video's own captions are poor.
+
+---
+
+## Connect TransTik to Claude
+
+With this connected, you can ask Claude things like:
+
+> Transcribe https://www.tiktok.com/@someone/video/123 and give me 10 hooks for my skincare channel based on it.
+
+> Search my TransTik library for "morning routine", pick the most-viewed video, and explain why it worked.
+
+> Write a 45-second script about meal prep that follows the structure of transcript 12, and check that it's original.
+
+Claude does the writing; TransTik gives it the transcripts, the numbers, and step-by-step writing guides. It also checks how much of a new script copies the original, so you don't accidentally post a near-copy.
+
+### Claude Desktop app (Mac)
+
+1. Install **Node.js**: download the **LTS** version from **https://nodejs.org** and run the installer.
+2. Open the **Claude** app. In the menu bar choose **Claude → Settings… → Developer → Edit Config**. A Finder window opens with the file `claude_desktop_config.json` selected.
+3. Open that file with **TextEdit** (right-click → **Open With → TextEdit**).
+4. Replace everything in it with the text below. If the file already has other servers listed under `"mcpServers"`, add the `"transtik"` part next to them instead.
+
+   ```json
+   {
+     "mcpServers": {
+       "transtik": {
+         "command": "npx",
+         "args": ["-y", "mcp-remote", "http://localhost:8765/mcp"]
+       }
+     }
+   }
+   ```
+
+5. Save (**⌘ + S**), then **quit Claude completely (⌘ + Q)** and open it again.
+6. In a new chat, open the tools menu and check that **transtik** is listed. If you're asked to allow a TransTik tool, choose **Allow**.
+
+The same text, with a copy button, is on TransTik's **Settings** page.
 
 ### Claude Code
 
-```bash
-claude mcp add --transport http transcript-desk http://localhost:8765/mcp
-```
-
-### Claude Desktop
-
-Claude Desktop needs a small bridge (`mcp-remote`) to reach a local HTTP server. Install [Node.js](https://nodejs.org), then in Claude Desktop open **Settings → Developer → Edit config** and add:
-
-```json
-{
-  "mcpServers": {
-    "transcript-desk": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "http://localhost:8765/mcp"]
-    }
-  }
-}
-```
-
-Restart Claude Desktop. The tools appear under the tools menu in a new chat.
-
-### ChatGPT, or claude.ai in a browser
-
-These run in the cloud and cannot see `localhost`, so they need a public HTTPS address. Start the optional tunnel:
+Run this once in Terminal:
 
 ```bash
+claude mcp add --transport http transtik http://localhost:8765/mcp
+```
+
+### ChatGPT, or claude.ai in a web browser
+
+These run in the cloud and can't reach your Mac directly, so they need a temporary public address:
+
+```bash
+cd ~/Documents/TransTik-main
 docker compose --profile tunnel up -d
 ```
 
-After about 10 seconds, **Settings** shows an address like `https://something.trycloudflare.com/mcp/<secret>`. Add it as a custom connector (MCP server, no authentication) in ChatGPT or claude.ai. Connector menus move around, so look for "Connectors" or "Custom connector" in each app's settings.
+After about 10 seconds, TransTik's **Settings** page shows an address like `https://something.trycloudflare.com/mcp/…`. Add it as a custom connector (MCP server, no authentication) in ChatGPT or claude.ai.
 
-What to know:
-- Only the MCP endpoint goes through the tunnel. The web app and REST API stay on your laptop.
-- The secret in the address is the only protection. Don't share it. To change it, set a new `MCP_SECRET` in `.env` (or delete `data/mcp_secret.txt`) and restart.
-- The address changes every time the tunnel restarts, and it works only while your laptop is on and awake.
-- Stop it with `docker compose --profile tunnel down`.
-
-### What to ask
-
-> Transcribe https://www.tiktok.com/@someone/video/123 and give me 10 hooks for my fitness channel based on it.
-
-> Search my library for "morning routine", pick the most-viewed one, and explain why it worked.
-
-> Write me a 45-second script about meal prep that follows the structure of transcript 12. Check it for originality.
-
-Writing happens in the assistant you already use; the server supplies transcripts, numbers and playbooks. Prompts called **Generate hooks**, **Remix a script** and **Explain virality** also show up in Claude.
+- The address works only while your Mac is awake, and changes each time the tunnel restarts.
+- **Keep it private.** Anyone with the address can use your library.
+- Turn it off: `docker compose --profile tunnel down` (this stops TransTik too; start it again with `docker compose up -d`).
 
 ---
 
-## 3. When something breaks
+## Everyday care
 
-Platforms change often, and most failures fix themselves with a newer yt-dlp. The app updates yt-dlp on every start (`YTDLP_AUTO_UPDATE=1`), and **Settings → Update now** does it on demand.
+TransTik runs whenever Docker Desktop is running. To use these commands, open Terminal and first run `cd ~/Documents/TransTik-main`.
 
-| Error | What it means | What to do |
-|---|---|---|
-| `ASR_NOT_CONFIGURED` | No captions and no speech-to-text key | Set `ASR_API_KEY` |
-| `LOGIN_REQUIRED` | The platform wants a login (common on Instagram) | Add a cookies file, see below |
-| `RATE_LIMITED` / `NETWORK` | Too many requests, or a connection hiccup | Retried automatically; wait if it keeps happening |
-| `FORBIDDEN` | The platform refused this video | Probably private or removed; if every link fails, update yt-dlp |
-| `EXTRACTOR_BROKEN` | The platform changed its site | Settings → Update now, then Retry |
-| `NO_SPEECH` | Music only, or silent | Nothing to transcribe |
-| `GEO_BLOCKED` | Not available from your country | Can't fix from here |
+| To… | Run |
+|---|---|
+| Stop TransTik | `docker compose down` |
+| Start it again | `docker compose up -d` |
+| See what it's doing (when something seems stuck) | `docker compose logs --tail 50 api` |
+| Check that TikTok, Instagram and YouTube still work | `docker compose exec api python -m app.smoke` |
 
-Run `docker compose exec api python -m app.smoke` to see which platforms work right now.
+### Updating to a new version
 
-**Cookies (optional).** If Instagram keeps asking for a login, export cookies for instagram.com from your browser in Netscape format (a "Get cookies.txt" style extension does this) and save the file as `data/cookies.txt`. Requests then go out as that account, so use one you're comfortable with and never share the file.
+Your library lives in the `data` folder inside `TransTik-main`. Keep that folder.
 
----
+1. Stop TransTik: `docker compose down`
+2. Download the new ZIP (Step 2) and unzip it.
+3. Move the **`data`** folder from your old `TransTik-main` into the new one (replace the empty one).
+4. Put the new folder where the old one was (delete or rename the old one first).
+5. In Terminal: `cd ~/Documents/TransTik-main` then `docker compose up -d --build`
 
-## 4. Your data
+### Back up your library
 
-Everything lives in the `data/` folder next to `docker-compose.yml`:
-
-- `app.db`: the library (SQLite). Copy `data/` to back it up or move it to another machine.
-- `thumbs/`: thumbnail images.
-- `mcp_secret.txt`: the tunnel secret, if you didn't set one.
-
-No accounts, no analytics. Every port is bound to `127.0.0.1`, so other devices on your network can't reach the app.
-
-### Fair use
-
-This tool reads public videos the way a browser would; it doesn't download or keep the videos. Platform terms generally don't allow automated access, so keep it personal, transcribe only public videos, and don't publish other people's transcripts. Scripts you write with it must be your own work; the originality check helps you avoid copying.
+Copy the `data` folder somewhere safe. It holds every transcript, your settings and your saved key. To move TransTik to another Mac, set it up there, then replace its `data` folder with your copy.
 
 ---
 
-## 5. Development
+## When something goes wrong
+
+**Problems starting it**
+
+| You see | Do this |
+|---|---|
+| `command not found: docker` | Docker Desktop isn't installed or hasn't been opened yet. Open it from Applications and try again. |
+| `Cannot connect to the Docker daemon` | Docker Desktop isn't running. Open it, wait for the whale icon to settle, and try again. |
+| `no such file or directory` after `cd` | The folder is somewhere else or has a different name. Type `cd ` (with a space), drag the TransTik folder from Finder into Terminal, and press Return. |
+| `port is already allocated` | Another app uses port 3000. In the TransTik folder, create a file named `.env` containing `WEB_PORT=3001`, run `docker compose up -d`, and open http://localhost:3001 instead. |
+| The page at localhost:3000 won't load | Wait a minute after starting; it may still be booting. Then check Docker Desktop: both `transtik` containers should show as running. |
+| The first build stopped with a network error | Your connection dropped. Run `docker compose up -d --build` again; it continues where it stopped. |
+
+**A link fails.** Each failed link shows a short explanation and a **Retry** button.
+
+| Error | What it means |
+|---|---|
+| ASR NOT CONFIGURED | The video has no captions and no speech-to-text key is saved. Add one in Settings. |
+| ASR FAILED | The key was rejected or has run out of credit. Settings → **Test key**. |
+| EXTRACTOR BROKEN | TikTok or Instagram changed their website. Settings → **Update now**, then Retry. |
+| LOGIN REQUIRED | Instagram wants a login (see "Instagram keeps failing" below). |
+| FORBIDDEN | The platform refused that video; it's probably private or removed. |
+| RATE LIMITED / NETWORK | Too many requests, or a connection hiccup. TransTik retries by itself; wait a bit. |
+| NO SPEECH | The video is music only, or silent. |
+| GEO BLOCKED | The video isn't available in your country. |
+
+**Instagram keeps failing.** Instagram sometimes needs a logged-in account. Install a browser extension that exports cookies in "Netscape cookies.txt" format, log in to instagram.com, export the cookies for instagram.com, and save the file as `cookies.txt` inside the `data` folder. Requests then go out as that account, so use one you don't mind, and never share the file.
+
+**Claude doesn't show TransTik.** Check that TransTik is running (http://localhost:3000 opens), that Node.js is installed, and that the config file is valid JSON (every `{` has a matching `}`; quotes are straight `"`, not curly). Then quit Claude with ⌘ + Q and reopen it.
+
+---
+
+## Privacy and fair use
+
+- Your library, settings and key stay in the `data` folder on your Mac. There are no accounts and no tracking.
+- TransTik is reachable only from your own Mac, not from other devices on your Wi-Fi.
+- Audio from videos without captions is sent to your speech-to-text provider (OpenAI or Groq), then deleted from your Mac.
+- TransTik reads public videos the way a browser does; it doesn't download or keep the videos. Keep it for personal research, don't publish other people's transcripts, and make sure scripts you post are your own work. The originality check helps with that.
+
+---
+
+## For developers
 
 ```
-api/   FastAPI + MCP server + job worker (Python 3.12, uv)
-web/   Next.js app
-data/  local library (git-ignored)
+api/    Python 3.12 · FastAPI · MCP server · job worker · SQLite (uv)
+web/    Next.js app
+data/   your library (not in git)
 ```
 
-Run without Docker. You need `uv`, Node 22+, and `ffmpeg` on your PATH for speech-to-text:
+How a link is processed (`api/app/pipeline.py`): work out the platform and video id → reuse the saved transcript if the video was done before → fetch metadata with yt-dlp → use creator subtitles, then auto-captions in the video's own language → otherwise download audio only, shrink it to 16 kHz mono Opus, send it to speech-to-text, delete it → drop repeated hallucinated lines → save and index for search.
+
+The web API (`routes.py`) and the MCP tools (`mcp_server.py`) are thin wrappers over the same functions in `library.py`, so the app and Claude always behave the same. All platform access goes through `acquire.py`.
+
+Run without Docker (needs `uv`, Node 22+, and `ffmpeg` for speech-to-text):
 
 ```bash
-cd api && uv sync && DATA_DIR=../data uv run python -m app.main     # http://localhost:8765
-cd web && npm install && npm run dev -- -p 3210                      # http://localhost:3210
-cd api && uv run pytest                                              # unit tests
+cd api && uv sync && DATA_DIR=../data uv run python -m app.main     # API + MCP on :8765
+cd web && npm install && npm run dev -- -p 3210                      # app on :3210
+cd api && uv run pytest                                              # tests
 ```
 
-How a link is processed (`api/app/pipeline.py`): find the platform and video id → reuse the saved transcript if the video was done before → fetch metadata → use creator subtitles, then platform auto-captions in the video's own language → otherwise download audio only, shrink it to 16 kHz mono Opus, send it to speech-to-text, delete it → remove repeated hallucinated lines → save and index.
-
-The REST routes (`routes.py`) and MCP tools (`mcp_server.py`) are thin wrappers over the same services in `library.py`, so the web app and the assistant always behave the same. All platform access goes through `acquire.py`; to swap yt-dlp for an official API, replace `YtDlpAcquirer`.
+Settings come from the Settings page (`data/settings.json`) or `.env` (see `.env.example`); the Settings page wins.
